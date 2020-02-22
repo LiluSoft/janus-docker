@@ -1,0 +1,12 @@
+{
+    "files.associations": {
+      "*.jcfg": "libconfig",
+      "*.cfg": "ini"
+    },
+    "cSpell.words": [
+      "healthcheck",
+      "lilusoft",
+      "mosquitto",
+      "rabbitmq"
+    ]
+  }

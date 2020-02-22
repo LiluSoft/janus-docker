@@ -1,0 +1,54 @@
+version: '2.1'
+
+services:
+  mqtt-server:
+    image: eclipse-mosquitto
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf 
+      - ./mosquitto/passwords.txt:/mosquitto/config/passwords.txt
+    ports:
+      - 1883:1883
+      - 9001:9001
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "9001" ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+  rabbitmq:
+    image: rabbitmq:3.6-management-alpine
+    ports:
+      - '5672:5672' # The standard AMQP protocol port
+      - '15672:15672' # HTTP management UI
+    volumes:
+       - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+    healthcheck:
+      timeout: 5s
+      interval: 5s
+      retries: 5
+      test:
+        - "CMD"
+        - "rabbitmqctl"
+        - "status"
+  janus-demo:
+    image: lilusoft/janus-gateway-demo:0.0.1
+    build: ./demo
+    ports:
+      - 80:80
+  janus-gateway:
+    image: lilusoft/janus-gateway:0.0.1
+    build: ./janus
+    container_name: janus-gateway
+    volumes:
+      - ./janus/etc/janus/:/opt/janus/etc/janus/
+    ports:
+      - 8088:8088
+      - 8188:8188
+      - 7088:7088
+      - 7188:7188
+      - "10020-10200:10020-10200" #session establishment
+      - "10020-10200:10020-10200/udp" #session establishment
+    depends_on:
+      mqtt-server:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
