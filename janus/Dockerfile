@@ -190,4 +190,4 @@ RUN dpkg -i /janusgateway.deb
 
 ENV LD_LIBRARY_PATH=/usr/local/lib
 
-CMD ["/opt/janus/bin/janus","--nat-1-1=${DOCKER_IP}"]
+CMD /opt/janus/bin/janus --nat-1-1=${DOCKER_IP}
